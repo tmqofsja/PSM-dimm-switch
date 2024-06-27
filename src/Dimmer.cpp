@@ -21,7 +21,7 @@ volatile unsigned int value = 0;
 EasyNex myNex(USART_LCD);
 
 static void cpsInit(void);
-
+ 
 
 
 void setup() {
