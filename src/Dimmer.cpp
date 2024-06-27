@@ -40,15 +40,6 @@ pumpInit(60u,myNex.readNumber("sP.pump_zero.val") / 10000.f);
 void updateValue() {
 
   int readValue = myNex.readNumber("pi.readTemp.val"); //analogRead(valuePin);
-
-  if(myNex.readNumber("pi.readTemp.val"))
-   setPumpOff();
-
-
-  setPumpFullOn();
-
-
-  
   int oldValue = value * valueFactor * 2;
 
   if (readValue >= (oldValue + valueFactor * 3) || (readValue + valueFactor) < oldValue) { // add some hysteresis to filter out noise
