@@ -2,18 +2,8 @@
 #include "Dimmer.h"
 #include "pump.h"
 
-const byte valuePin = PB1; // potentiometer input
-
-const byte controlPin = PA1;  // triac output
-const byte interruptPin = PA0; // phase sensing
-
-const unsigned int range = 127;
-
-//PSM pump(interruptPin, controlPin, range);
-
 const int REFRESH_TIME = 100;           // time to refresh the Nextion page every 100 ms
 unsigned long refresh_timer = millis();  // timer for refreshing Nextion's page
-
 
 const unsigned int valueFactor = 4; // precalculated constant 1024 [10 bit ADC resolution] / 128 [range + 1] / 2
 volatile unsigned int value = 0;
@@ -21,9 +11,8 @@ volatile unsigned int value = 0;
 EasyNex myNex(USART_LCD);
 
 static void cpsInit(void);
+static void lcdRefresh(void);
  
-
-
 void setup() {
 
       Serial.begin(115200);
@@ -38,9 +27,10 @@ void setup() {
 int16_t tem;
 
 void loop() {
+  lcdRefresh();
     tem = millis()-refresh_timer;
   if(tem >= REFRESH_TIME){ 
-    setPumpToRawValue(myNex.readNumber("pi.readTemp.val"));
+    //setPumpToRawValue(myNex.readNumber("pi.readTemp.val"));
     delay(500);
     refresh_timer = millis();  
   }
@@ -91,5 +81,15 @@ void lcdShowPopup(const char *msg) {
     myNex.writeStr("popupMSG.t0.txt", msg);
     myNex.writeStr("page popupMSG");
     timer = millis();
+  }
+}
+
+static void lcdRefresh(void) {
+  uint16_t tempDecimal;
+
+  if (millis() > pageRefreshTimer) {
+      int tmp = myNex.readNumber("pi.readTemp.val");
+      if(tmp) setPumpToRawValue(tmp);
+    pageRefreshTimer = millis() + REFRESH_SCREEN_EVERY;
   }
 }
