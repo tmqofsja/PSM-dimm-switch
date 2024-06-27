@@ -26,46 +26,24 @@ static void cpsInit(void);
 
 void setup() {
 
-Serial.begin(115200);
-  //Pump
-  setPumpOff();
-lcdInit();
-cpsInit();
-  // Pump init
-pumpInit(60u,myNex.readNumber("sP.pump_zero.val") / 10000.f); 
-    
-}
+      Serial.begin(115200);
+      //Pump
+      setPumpOff();
+      lcdInit();
+      cpsInit();
+      // Pump init
+      pumpInit(60u,myNex.readNumber("sP.pump_zero.val") / 10000.f); 
+      }
 
-
-void updateValue() {
-
-  int readValue = myNex.readNumber("pi.readTemp.val"); //analogRead(valuePin);
-  int oldValue = value * valueFactor * 2;
-
-  if (readValue >= (oldValue + valueFactor * 3) || (readValue + valueFactor) < oldValue) { // add some hysteresis to filter out noise
-    value = readValue / valueFactor / 2;
-    setPumpToRawValue(value);
-  }
-  
-  myNex.writeNum("pi.temp.val",float(readValue)); 
-  myNex.writeNum("pi.temp1.val",float(value)); 
-
-  Serial.println(readValue);
-  Serial.println(oldValue);
-}
 int16_t tem;
 
 void loop() {
-
-  tem = millis()-refresh_timer;
+    tem = millis()-refresh_timer;
   if(tem >= REFRESH_TIME){ 
-
-  updateValue();
-  delay(500);
-
-  refresh_timer = millis();  
-
-}
+    setPumpToRawValue(myNex.readNumber("pi.readTemp.val"));
+    delay(500);
+    refresh_timer = millis();  
+  }
 }
 
 
